@@ -27,7 +27,7 @@ export default {
             let optionsChecked = [];
             this.options.forEach(option => {
                 if (option.checked) {
-                    optionsChecked.push(option.value);
+                    optionsChecked.push(option);
                 }
             })
             this.$emit('change', optionsChecked)

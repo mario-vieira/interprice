@@ -6,9 +6,22 @@
             <SingleToggle :options="displayMetrics" name="metrics" @change="setSelectedMetric"/>
         </div>
 
-        <input type="text" class="form-control" :value="searchCompany" @input="setSearchCompany($event.target.value)" placeholder="Filter by company name..."/>
+        <input
+            type="text"
+            class="form-control search-bar"
+            placeholder="Filter by company name..."
+            :value="searchCompany"
+            @input="setSearchCompany($event.target.value)"/>
 
-
+        <InterPriceTable
+            :years="selectedYears"
+            :companies="filteredData"
+            :selected-metric="selectedMetric"
+            :not-selected-metrics="notSelectedMetrics"
+            :sortBy="sortBy"
+            :sortOrder="sortOrder"
+            @sortChanged="setSortBy"
+        />
     </div>
 </template>
 
@@ -16,9 +29,10 @@
 import {mapState, mapGetters, mapActions} from 'vuex';
 import MultiToggle from "@/components/MultiToggle.vue";
 import SingleToggle from "@/components/SingleToggle.vue";
+import InterPriceTable from "@/components/InterPriceTable.vue";
 export default {
     name: "InterPricePage",
-    components: {SingleToggle, MultiToggle},
+    components: {InterPriceTable, SingleToggle, MultiToggle},
     props: {
         msg: String
     },
@@ -31,12 +45,15 @@ export default {
             displayMetrics: state => state.quotes.displayMetrics,
             searchCompany: state => state.quotes.searchCompany,
             selectedYears: state => state.quotes.selectedYears,
-            selectedMetric: state => state.quotes.selectedMetric
+            selectedMetric: state => state.quotes.selectedMetric,
+            sortBy: state => state.quotes.sortBy,
+            sortOrder: state => state.quotes.sortOrder
         }),
         ...mapGetters({
             currencies: "quotes/currencies",
             years: "quotes/years",
-            filteredData: "quotes/filteredData"
+            filteredData: "quotes/filteredData",
+            notSelectedMetrics: "quotes/notSelectedMetrics"
         })
     },
     methods: {
@@ -45,12 +62,15 @@ export default {
             setSelectedCurrency: "quotes/setSelectedCurrency",
             setSelectedYears: "quotes/setSelectedYears",
             setSearchCompany: "quotes/setSearchCompany",
-            setSelectedMetric: "quotes/setSelectedMetric"
+            setSelectedMetric: "quotes/setSelectedMetric",
+            setSortBy: "quotes/setSortBy"
         })
     }
 }
 </script>
 
 <style scoped>
-
+.search-bar {
+    width: 20%;
+}
 </style>

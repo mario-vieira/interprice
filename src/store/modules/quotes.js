@@ -57,7 +57,7 @@ const getters = {
                         if (!yearsForCurrency.some(y => y.value === quote.Years)) {
                             yearsForCurrency.push(
                                 {
-                                    title: quote.Years + 'YRS',
+                                    title: quote.Years + ' YRS',
                                     value: quote.Years,
                                     checked: true
                                 }
@@ -72,7 +72,7 @@ const getters = {
     filteredData(state) {
         let companies = [];
         state.all.Items.forEach((item) => {
-            if (item.Company.includes(state.searchCompany)) {
+            if (item.Company.toLowerCase().includes(state.searchCompany.toLowerCase())) {
                 companies.push({...item});
             }
         });
@@ -80,8 +80,7 @@ const getters = {
             if (company.Quote) {
                 let quotes = [];
                 company.Quote.forEach((quote) => {
-                    //debugger; // eslint-disable-line no-debugger
-                    if (quote.Currency === state.selectedCurrency && state.selectedYears.includes(quote.Years)) {
+                    if (quote.Currency === state.selectedCurrency && state.selectedYears.some(year => year.value === quote.Years)) {
                         quotes.push(quote);
                     }
                 });
@@ -89,13 +88,45 @@ const getters = {
                 company.Quote = quotes;
             }
         });
+
+        // Sort by selected key and then by Preferred flag
+        companies.sort((a, b) => {
+            if (!a.Quote) {
+                return 1;
+            }
+            if (state.sortOrder === 'desc') {
+                if (a[state.sortBy] > b[state.sortBy]) return -1;
+                if (a[state.sortBy] < b[state.sortBy]) return 1;
+                if (a.Preferred > b.Preferred) return -1;
+                if (a.Preferred < b.Preferred) return 1;
+            } else {
+                if (a[state.sortBy] > b[state.sortBy]) return 1;
+                if (a[state.sortBy] < b[state.sortBy]) return -1;
+                if (a.Preferred > b.Preferred) return 1;
+                if (a.Preferred < b.Preferred) return -1;
+            }
+
+            return 0;
+        });
         return companies;
+    },
+    notSelectedMetrics(state) {
+        let metrics = [];
+        state.displayMetrics.forEach((metric) => {
+            if (metric.value !== state.selectedMetric) {
+                metrics.push(metric.title);
+            }
+        });
+        return metrics;
     }
 }
 
 const actions = {
-    loadData({state}) {
+    loadData({state, getters}) {
         state.all = data;
+        getters.years.forEach((year) => {
+            state.selectedYears.push({value: year.value, title: year.value + ' YRS', checked: true});
+        })
     },
     setSelectedCurrency({commit, getters}, currency) {
         commit('setSelectedCurrency', currency);
@@ -110,6 +141,14 @@ const actions = {
     },
     setSelectedMetric({commit}, metric) {
         commit('setSelectedMetric', metric);
+    },
+    setSortBy({state, commit}, sortBy) {
+        if (sortBy === state.sortBy) {
+            commit('setSortOrder', state.sortOrder === 'asc' ? 'desc' : 'asc');
+        } else {
+            commit('setSortOrder', 'desc');
+        }
+        commit('setSortBy', sortBy);
     }
 }
 const mutations = {
@@ -124,6 +163,12 @@ const mutations = {
     },
     setSelectedMetric(state, metric) {
         state.selectedMetric = metric;
+    },
+    setSortBy(state, sortBy) {
+        state.sortBy = sortBy;
+    },
+    setSortOrder(state, sortOrder) {
+        state.sortOrder = sortOrder;
     }
 }
 

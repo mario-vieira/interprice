@@ -32,5 +32,6 @@ export default {
 
 .btn-toolbar {
     gap: 40px;
+    padding: 20px 0;
 }
 </style>
