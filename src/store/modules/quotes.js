@@ -9,6 +9,7 @@ const state = {
     searchCompany: '',
     sortBy: 'DateSent',
     sortOrder: 'desc',
+    months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     displayMetrics: [
         {
             title: 'Spread',
@@ -77,6 +78,7 @@ const getters = {
             }
         });
         companies.forEach((company) => {
+            company.expanded = false;
             if (company.Quote) {
                 let quotes = [];
                 company.Quote.forEach((quote) => {
@@ -124,6 +126,12 @@ const getters = {
 const actions = {
     loadData({state, getters}) {
         state.all = data;
+        state.all.Items.forEach((item) => {
+            if (item.DateSent) {
+                let date =  new Date(item.DateSent);
+                item.DateSent = date.getDate() + '-' + state.months[date.getMonth()] + '-' + String(date.getUTCFullYear()).slice(-2)
+            }
+        })
         getters.years.forEach((year) => {
             state.selectedYears.push({value: year.value, title: year.value + ' YRS', checked: true});
         })

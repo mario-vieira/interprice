@@ -13,15 +13,15 @@
             </tr>
             <tr>
                 <th v-for="index in (years.length) * 2" :key="index" class="text-center gray">
-                    {{ displayCouponType() }}
+                    {{ displayCouponType(index) }}
                 </th>
             </tr>
         </thead>
         <tbody v-for="company in companies" :key="company.Company">
-            <tr data-bs-toggle="collapse" :data-bs-target="'#' + company.Company" class="accordion-toggle">
-                <td><i class="bi-chevron-down"></i></td>
+            <tr @click="toggle(company)" data-bs-toggle="collapse" :data-bs-target="'#' + company.Company" class="accordion-toggle">
+                <td><i :class="company.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i></td>
                 <td>{{ company.DateSent }}</td>
-                <td>{{ company.Company }}</td>
+                <td class="fw-bold" :class="{'gray': !company.Quote}">{{ company.Company }}</td>
                 <td v-for="index in (years.length) * 2" :key="index" class="text-center">
                     {{ displayMetric(selectedMetric, company.Quote, index) }}
                 </td>
@@ -56,7 +56,7 @@ export default {
             type: Array,
             required: true
         },
-        companies: {
+        items: {
             type: Array,
             required: true
         },
@@ -82,6 +82,7 @@ export default {
     },
     data() {
         return {
+            companies: this.items,
             metricPrefixes: {
                 'Spread': '+',
                 '3MLSpread': '+',
@@ -96,7 +97,7 @@ export default {
     },
     methods: {
         displayCouponType(index) {
-            return index % 2 === 0 ? 'FRN' : 'FIX'
+            return index % 2 === 0 ? 'FRN' : 'FIX';
         },
         displayMetric(metric, quotes, index) {
             if (quotes) {
@@ -163,9 +164,16 @@ export default {
         },
         sortChanged(key) {
             this.$emit('sortChanged', key);
+        },
+        toggle(company) {
+            company.expanded = !company.expanded;
         }
     },
-
+    watch:{
+        items(){
+            this.companies = this.items;
+        }
+    }
 }
 </script>
 

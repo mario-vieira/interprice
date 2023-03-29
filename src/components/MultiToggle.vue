@@ -1,7 +1,8 @@
 <template>
     <div class="btn-group" role="group">
         <div class="btn-container" v-for="option in dataOptions" :key="option.value">
-            <input type="checkbox" class="btn-check" :id="option.value" autocomplete="off" :checked="option.checked" @change="onChange(option)">
+            <input type="checkbox" class="btn-check" :id="option.value" autocomplete="off" :checked="option.checked"
+                   @change="onChange(option)">
             <label class="btn btn-outline-primary" :for="option.value"> {{ option.title }} </label>
         </div>
     </div>
@@ -42,5 +43,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

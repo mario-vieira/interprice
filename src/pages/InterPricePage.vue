@@ -15,7 +15,7 @@
 
         <InterPriceTable
             :years="selectedYears"
-            :companies="filteredData"
+            :items="filteredData"
             :selected-metric="selectedMetric"
             :not-selected-metrics="notSelectedMetrics"
             :sortBy="sortBy"
