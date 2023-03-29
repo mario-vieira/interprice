@@ -34,4 +34,15 @@ export default {
     gap: 40px;
     padding: 20px 0;
 }
+
+.btn-outline-primary {
+    --bs-btn-color: #527094 !important;
+    --bs-btn-border-color: #527094 !important;
+    --bs-btn-hover-bg: #527094 !important;
+    --bs-btn-hover-border-color: #527094 !important;
+    --bs-btn-active-bg: #527094 !important;
+    --bs-btn-active-border-color: #527094 !important;
+    --bs-btn-disabled-color: #527094 !important;
+    --bs-btn-disabled-border-color: #527094 !important;
+}
 </style>
