@@ -20,6 +20,7 @@
             :not-selected-metrics="notSelectedMetrics"
             :sortBy="sortBy"
             :sortOrder="sortOrder"
+            :minimumValues="minimumValues"
             @sortChanged="setSortBy"
         />
     </div>
@@ -47,7 +48,8 @@ export default {
             selectedYears: state => state.quotes.selectedYears,
             selectedMetric: state => state.quotes.selectedMetric,
             sortBy: state => state.quotes.sortBy,
-            sortOrder: state => state.quotes.sortOrder
+            sortOrder: state => state.quotes.sortOrder,
+            minimumValues: state => state.quotes.minimumValuesPerYearAndCoupon
         }),
         ...mapGetters({
             currencies: "quotes/currencies",

@@ -2,27 +2,37 @@
     <table class="table">
         <thead>
             <tr>
-                <th rowspan="2"></th>
-                <th rowspan="2" class="is-clickable" @click="sortChanged('DateSent')">
+                <th rowspan="2" class="icon-column"></th>
+                <th rowspan="2" class="is-clickable date-column text-nowrap" @click="sortChanged('DateSent')">
                     <span class="gray">Date sent</span> <i :class="sortIcon('DateSent')"></i>
                 </th>
-                <th rowspan="2" class="is-clickable" @click="sortChanged('Company')">
+                <th rowspan="2" class="is-clickable text-nowrap" @click="sortChanged('Company')">
                     <span class="gray">Company</span> <i :class="sortIcon('Company')"></i>
                 </th>
                 <th colspan="2" class="text-center" v-for="year in years" :key="year.value">{{ year.title }}</th>
             </tr>
             <tr>
-                <th v-for="index in (years.length) * 2" :key="index" class="text-center gray">
-                    {{ displayCouponType(index) }}
+                <th v-for="index in (years.length) * 2" :key="index" class="coupons text-center gray">
+                    {{ getCouponType(index) }}
                 </th>
             </tr>
         </thead>
         <tbody v-for="company in companies" :key="company.Company">
             <tr @click="toggle(company)" data-bs-toggle="collapse" :data-bs-target="'#' + company.Company" class="accordion-toggle">
-                <td><i :class="company.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i></td>
-                <td>{{ company.DateSent }}</td>
-                <td class="fw-bold" :class="{'gray': !company.Quote}">{{ company.Company }}</td>
-                <td v-for="index in (years.length) * 2" :key="index" class="text-center">
+                <td>
+                    <i v-if="company.Quote" :class="company.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"></i>
+                </td>
+                <td>
+                    {{ company.DateSent }}
+                </td>
+                <td class="fw-bold" :class="{'gray': !company.Quote}">
+                    {{ company.Company }}
+                </td>
+                <td
+                    v-for="index in (years.length) * 2"
+                    :key="index" class="text-center"
+                    :class="{highlighted: isMinimumValue(index, getMetric(selectedMetric, company.Quote, index))}"
+                >
                     {{ displayMetric(selectedMetric, company.Quote, index) }}
                 </td>
             </tr>
@@ -79,6 +89,10 @@ export default {
                 return ['desc', 'asc'].includes(value)
             }
         },
+        minimumValues: {
+            type: Object,
+            required: true
+        },
     },
     data() {
         return {
@@ -96,10 +110,10 @@ export default {
         }
     },
     methods: {
-        displayCouponType(index) {
+        getCouponType(index) {
             return index % 2 === 0 ? 'FRN' : 'FIX';
         },
-        displayMetric(metric, quotes, index) {
+        getMetric(metric, quotes, index) {
             if (quotes) {
                 //debugger; // eslint-disable-line no-debugger
 
@@ -108,17 +122,21 @@ export default {
                 if (index % 2 === 0) {
                     let quote = quotes.find(q => q.Years === year && q.CouponType === 'FRN');
                     if (quote) {
-                        return this.displayPrefix(metric) + quote[metric] + this.displaySufix(metric);
+                        return quote[metric];
                     }
                 }
                 if (index % 2 === 1) {
                     let quote = quotes.find(q => q.Years === year && q.CouponType === 'FIX');
                     if (quote) {
-                        return this.displayPrefix(metric) + quote[metric] + this.displaySufix(metric);
+                        return quote[metric];
                     }
                 }
             }
             return '';
+        },
+        displayMetric(metric, quotes, index) {
+            let value = this.getMetric(metric, quotes, index);
+            return value ? this.displayPrefix(metric) + value + this.displaySufix(metric) : '';
         },
         displayPrefix(metric) {
             return this.metricPrefixes[metric];
@@ -167,6 +185,12 @@ export default {
         },
         toggle(company) {
             company.expanded = !company.expanded;
+        },
+        isMinimumValue(index, value) {
+            let years = this.years.map(y => y.value);
+            let year = years[Math.floor((index-1)/2)];
+            let couponType = this.getCouponType(index);
+            return this.minimumValues[year] && this.minimumValues[year][couponType] && this.minimumValues[year][couponType] === value;
         }
     },
     watch:{
@@ -185,6 +209,7 @@ export default {
 .table th {
     text-transform: uppercase;
     font-weight: normal;
+    border-color: black;
 }
 
 .gray {
@@ -193,5 +218,21 @@ export default {
 
 .is-clickable {
     cursor: pointer;
+}
+
+.coupons {
+    width: 5%;
+}
+
+.icon-column {
+    width: 2%;
+}
+
+.date-column {
+    width: 10%;
+}
+
+.highlighted {
+    background-color: #f4f2d9;
 }
 </style>

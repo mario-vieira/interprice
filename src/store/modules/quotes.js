@@ -10,6 +10,7 @@ const state = {
     sortBy: 'DateSent',
     sortOrder: 'desc',
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    minimumValuesPerYearAndCoupon: {},
     displayMetrics: [
         {
             title: 'Spread',
@@ -72,11 +73,14 @@ const getters = {
     },
     filteredData(state) {
         let companies = [];
+
         state.all.Items.forEach((item) => {
             if (item.Company.toLowerCase().includes(state.searchCompany.toLowerCase())) {
                 companies.push({...item});
             }
         });
+        state.minimumValuesPerYearAndCoupon = {};
+
         companies.forEach((company) => {
             company.expanded = false;
             if (company.Quote) {
@@ -86,7 +90,22 @@ const getters = {
                         quotes.push(quote);
                     }
                 });
+
                 quotes.sort((a, b) => a.years - b.years);
+                quotes.forEach((quote) => {
+                    //debugger; // eslint-disable-line no-debugger
+                    if (state.minimumValuesPerYearAndCoupon[quote.Years]) {
+                        if (state.minimumValuesPerYearAndCoupon[quote.Years][quote.CouponType]) {
+                            if (state.minimumValuesPerYearAndCoupon[quote.Years][quote.CouponType] > quote[state.selectedMetric]) {
+                                state.minimumValuesPerYearAndCoupon[quote.Years][quote.CouponType] = quote[state.selectedMetric];
+                            }
+                        } else {
+                            state.minimumValuesPerYearAndCoupon[quote.Years][quote.CouponType] = quote[state.selectedMetric];
+                        }
+                    } else {
+                        state.minimumValuesPerYearAndCoupon[quote.Years] = {[quote.CouponType]: quote[state.selectedMetric]};
+                    }
+                })
                 company.Quote = quotes;
             }
         });
@@ -138,8 +157,7 @@ const actions = {
     },
     setSelectedCurrency({commit, getters}, currency) {
         commit('setSelectedCurrency', currency);
-        let years = getters.years.map(year => year.value);
-        commit("setSelectedYears", years);
+        commit("setSelectedYears", getters.years);
     },
     setSelectedYears({commit}, years) {
         commit('setSelectedYears', years);
