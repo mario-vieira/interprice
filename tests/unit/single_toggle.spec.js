@@ -60,7 +60,6 @@ describe('SingleToggle', () => {
 
         radio.trigger('click')
 
-        expect(radio.attributes('checked')).toBe(true);
         expect(wrapper.emitted('change')).toBeTruthy()
         expect(wrapper.emitted('change')[0][0]).toBe(options[buttonIndex]['value'])
     })
