@@ -106,6 +106,11 @@ export default {
                 'Spread': 'bp',
                 '3MLSpread': 'bp',
                 'Yield': '%',
+            },
+            decimalPlaces: {
+                'Spread': 0,
+                '3MLSpread': 0,
+                'Yield': 3,
             }
         }
     },
@@ -170,9 +175,9 @@ export default {
                 })
             }
 
-            return result.length ?
-                this.displayPrefix(this.selectedMetric) + Math.round(result.reduce((a, b) => a + b, 0) / result.length) + this.displaySufix(this.selectedMetric)
-                : '';
+            let decimalPlaces = this.decimalPlaces[this.selectedMetric];
+            let average = parseFloat(result.reduce((a, b) => a + b, 0) / result.length).toFixed(decimalPlaces);
+            return result.length ? this.displayPrefix(this.selectedMetric) + average + this.displaySufix(this.selectedMetric) : '';
         },
         sortIcon(key) {
             if (this.sortBy !== key) {
