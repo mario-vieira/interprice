@@ -120,8 +120,6 @@ export default {
         },
         getMetric(metric, quotes, index) {
             if (quotes) {
-                //debugger; // eslint-disable-line no-debugger
-
                 let years = this.years.map(y => y.value);
                 let year = years[Math.floor((index-1)/2)];
                 if (index % 2 === 0) {

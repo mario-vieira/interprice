@@ -90,10 +90,11 @@ const getters = {
                         quotes.push(quote);
                     }
                 });
-
+                // Sort quotes by year
                 quotes.sort((a, b) => a.years - b.years);
+
+                // Calculate the minimum values for the selected metric per year and per coupon type
                 quotes.forEach((quote) => {
-                    //debugger; // eslint-disable-line no-debugger
                     if (state.minimumValuesPerYearAndCoupon[quote.Years]) {
                         if (state.minimumValuesPerYearAndCoupon[quote.Years][quote.CouponType]) {
                             if (state.minimumValuesPerYearAndCoupon[quote.Years][quote.CouponType] > quote[state.selectedMetric]) {
@@ -112,6 +113,7 @@ const getters = {
 
         // Sort by selected key and then by Preferred flag
         companies.sort((a, b) => {
+            // Companies without quotes will go to the bottom
             if (!a.Quote) {
                 return 1;
             }
